@@ -7,14 +7,14 @@ st.set_page_config(page_title="Hospitality Financial Insights", layout="wide")
 st.title("🏨 Interactive AP/AR & Revenue Performance Dashboard")
 st.markdown("Designed by an AI-Augmented Financial Analyst")
 
-# 2. Mock Dataset Function (Fixed Row Constraints)
+# 2. Mock Dataset Function (Fixed Syntax and Data Layout)
 @st.cache_data
 def load_data():
     data = {
         'Department': ['Rooms', 'F&B', 'Spa', 'Rooms', 'F&B', 'Events', 'Rooms', 'Events'],
         'Client_Type': ['Corporate', 'Transient', 'Transient', 'Group', 'Corporate', 'Group', 'Transient', 'Corporate'],
         'Invoice_Amount': [12500.00, 450.50, 210.00, 8900.00, 1200.00, 15000.00, 3400.00, 6200.00],
-        'Days_Outstanding':,  # Added an 8th element (110) to balance the table
+        'Days_Outstanding':,
         'Status': ['Current', '31-60 Days', 'Current', '61-90 Days', '91+ Days', 'Current', 'Current', '91+ Days']
     }
     return pd.DataFrame(data)
