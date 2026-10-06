@@ -14,7 +14,7 @@ def load_data():
         'Department': ['Rooms', 'F&B', 'Spa', 'Rooms', 'F&B', 'Events', 'Rooms', 'Events'],
         'Client_Type': ['Corporate', 'Transient', 'Transient', 'Group', 'Corporate', 'Group', 'Transient', 'Corporate'],
         'Invoice_Amount': [12500.00, 450.50, 210.00, 8900.00, 1200.00, 15000.00, 3400.00, 6200.00],
-        'Days_Outstanding':,
+        'Days_Outstanding': [30, 60, 90, 120, 150, 180, 210, 240],
         'Status': ['Current', '31-60 Days', 'Current', '61-90 Days', '91+ Days', 'Current', 'Current', '91+ Days']
     }
     return pd.DataFrame(data)
