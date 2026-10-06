@@ -7,7 +7,7 @@ st.set_page_config(page_title="Hospitality Financial Insights", layout="wide")
 st.title("🏨 Interactive AP/AR & Revenue Performance Dashboard")
 st.markdown("Designed by an AI-Augmented Financial Analyst")
 
-# 2. Mock Dataset Function (Fixed Syntax and Data Layout)
+# 2. Mock Dataset Function (With Complete Data Arrays)
 @st.cache_data
 def load_data():
     data = {
