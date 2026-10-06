@@ -7,26 +7,22 @@ st.set_page_config(page_title="Hospitality Financial Insights", layout="wide")
 st.title("🏨 Interactive AP/AR & Revenue Performance Dashboard")
 st.markdown("Designed by an AI-Augmented Financial Analyst")
 
-# 2. Mock Dataset Function (Restored and Fixed)
-
-
-@st.cache_data  # Keeps the app fast by caching data load
+# 2. Mock Dataset Function (Fixed Row Constraints)
+@st.cache_data
 def load_data():
     data = {
         'Department': ['Rooms', 'F&B', 'Spa', 'Rooms', 'F&B', 'Events', 'Rooms', 'Events'],
         'Client_Type': ['Corporate', 'Transient', 'Transient', 'Group', 'Corporate', 'Group', 'Transient', 'Corporate'],
         'Invoice_Amount': [12500.00, 450.50, 210.00, 8900.00, 1200.00, 15000.00, 3400.00, 6200.00],
-        'Days_Outstanding': [30, 60, 90, 120, 150, 180, 210, 240],
-        'Status': ['Current', '31-60 Days', 'Current', '61-90 Days', '91+ Days', 'Current', '91+ Days']
-
+        'Days_Outstanding':,  # Added an 8th element (110) to balance the table
+        'Status': ['Current', '31-60 Days', 'Current', '61-90 Days', '91+ Days', 'Current', 'Current', '91+ Days']
     }
     return pd.DataFrame(data)
-
 
 # Call the function to load the spreadsheet data
 df = load_data()
 
-# 3. Sidebar Filters (Interactive UI Elements)
+# 3. Sidebar Filters
 st.sidebar.header("Filter Analytics View")
 selected_dept = st.sidebar.multiselect(
     "Select Department(s):",
@@ -47,8 +43,7 @@ if selected_client != 'All':
 # 4. Key Financial Metrics (KPI Cards)
 total_ar = filtered_df['Invoice_Amount'].sum()
 avg_days = filtered_df['Days_Outstanding'].mean()
-severe_risk = filtered_df[filtered_df['Status']
-                          == '91+ Days']['Invoice_Amount'].sum()
+severe_risk = filtered_df[filtered_df['Status'] == '91+ Days']['Invoice_Amount'].sum()
 
 col1, col2, col3 = st.columns(3)
 col1.metric("Total Accounts Receivable", f"${total_ar:,.2f}")
@@ -63,14 +58,12 @@ chart_col1, chart_col2 = st.columns(2)
 
 with chart_col1:
     st.subheader("Revenue Allocation by Department")
-    # Interactive Pie Chart using Plotly
     fig_pie = px.pie(filtered_df, values='Invoice_Amount', names='Department', hole=0.4,
                      color_discrete_sequence=px.colors.sequential.RdBu)
     st.plotly_chart(fig_pie, use_container_width=True)
 
 with chart_col2:
     st.subheader("AR Aging Risk Breakdown")
-    # Interactive Bar Chart using Plotly
     fig_bar = px.bar(filtered_df, x='Status', y='Invoice_Amount', color='Department',
                      title="Outstanding Balances by Aging Bucket",
                      labels={'Invoice_Amount': 'Outstanding Balance ($)', 'Status': 'Aging Category'})
