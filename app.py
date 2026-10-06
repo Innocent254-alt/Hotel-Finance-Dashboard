@@ -7,9 +7,9 @@ st.set_page_config(page_title="Hospitality Financial Insights", layout="wide")
 st.title("🏨 Interactive AP/AR & Revenue Performance Dashboard")
 st.markdown("Designed by an AI-Augmented Financial Analyst")
 
-# 2. Mock Dataset Function (With Complete Data Arrays)
+# 2. Mock Dataset Function (Fallback if no file is uploaded)
 @st.cache_data
-def load_data():
+def load_mock_data():
     data = {
         'Department': ['Rooms', 'F&B', 'Spa', 'Rooms', 'F&B', 'Events', 'Rooms', 'Events'],
         'Client_Type': ['Corporate', 'Transient', 'Transient', 'Group', 'Corporate', 'Group', 'Transient', 'Corporate'],
@@ -19,10 +19,35 @@ def load_data():
     }
     return pd.DataFrame(data)
 
-# Call the function to load the spreadsheet data
-df = load_data()
+# 3. Interactive File Uploader Component
+st.sidebar.header("📥 Upload Property Ledger")
+uploaded_file = st.sidebar.file_uploader(
+    "Upload a PMS or Accounting export (.csv or .xlsx)", 
+    type=["csv", "xlsx"]
+)
 
-# 3. Sidebar Filters
+# Core Logic: If user uploads a file, use it; otherwise, use our clean mock data
+if uploaded_file is not None:
+    try:
+        if uploaded_file.name.endswith('.csv'):
+            df = pd.read_csv(uploaded_file)
+        else:
+            df = pd.read_excel(uploaded_file)
+        st.sidebar.success("🎉 File uploaded successfully!")
+    except Exception as e:
+        st.sidebar.error(f"❌ Error loading file: {e}")
+        df = load_mock_data()
+else:
+    st.sidebar.info("💡 Showing mock hospitality data. Upload your own file to analyze custom sheets.")
+    df = load_mock_data()
+
+# Validate that required columns exist in the uploaded file to prevent app crashes
+required_cols = ['Department', 'Client_Type', 'Invoice_Amount', 'Days_Outstanding', 'Status']
+if not all(col in df.columns for col in required_cols):
+    st.error(f"⚠️ Error: The uploaded file must contain these exact column headers: {', '.join(required_cols)}")
+    st.stop()
+
+# 4. Sidebar Interaction Filters
 st.sidebar.header("Filter Analytics View")
 selected_dept = st.sidebar.multiselect(
     "Select Department(s):",
@@ -35,12 +60,12 @@ selected_client = st.sidebar.selectbox(
     options=['All'] + list(df['Client_Type'].unique())
 )
 
-# Apply filters based on sidebar inputs
+# Apply runtime filters based on sidebar user selections
 filtered_df = df[df['Department'].isin(selected_dept)]
 if selected_client != 'All':
     filtered_df = filtered_df[filtered_df['Client_Type'] == selected_client]
 
-# 4. Key Financial Metrics (KPI Cards)
+# 5. Key Financial Metrics (KPI Cards)
 total_ar = filtered_df['Invoice_Amount'].sum()
 avg_days = filtered_df['Days_Outstanding'].mean()
 severe_risk = filtered_df[filtered_df['Status'] == '91+ Days']['Invoice_Amount'].sum()
@@ -53,7 +78,7 @@ col3.metric("Severe Collection Risk (91+ Days)",
 
 st.markdown("---")
 
-# 5. Dynamic Interactive Visualizations
+# 6. Dynamic Interactive Visualizations
 chart_col1, chart_col2 = st.columns(2)
 
 with chart_col1:
@@ -69,6 +94,6 @@ with chart_col2:
                      labels={'Invoice_Amount': 'Outstanding Balance ($)', 'Status': 'Aging Category'})
     st.plotly_chart(fig_bar, use_container_width=True)
 
-# 6. Raw Data Inspection Toggle
+# 7. Raw Data Inspection Toggle
 if st.checkbox("Show Raw Ledger Sheet"):
     st.dataframe(filtered_df)
